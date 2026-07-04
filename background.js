@@ -300,9 +300,30 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 
   getSettings()
     .then((settings) => {
-      if (!settings.enabled || isPaused(settings)) return null;
+      if (!settings.enabled) return null;
+
+      // 一時解除の期限が切れていたら、アラームの発火を待たずにここでブロックルールを復帰させる。
+      // （MV3ではService Worker停止中にアラームが遅延・不発になることがあり、
+      //  それだけに頼ると期限を過ぎてもサイトが開けてしまうため。）
+      const pauseExpired = Boolean(settings.pauseUntil && settings.pauseUntil <= Date.now());
+      if (pauseExpired) {
+        queueRulesUpdate();
+      }
+
+      // まだ解除期間内なら何もしない。
+      if (!pauseExpired && isPaused(settings)) return null;
+
       const matchedSite = findMatchingSite(details.url, settings.sites);
-      return matchedSite ? recordBlockedAttempt(details.url, matchedSite, details.tabId) : null;
+      if (!matchedSite) return null;
+
+      // 期限切れ直後はDNRルールの再登録が間に合わないことがあるので、
+      // この遷移自体もブロックページへ明示的に飛ばして確実に止める。
+      if (pauseExpired && Number.isFinite(details.tabId) && details.tabId >= 0) {
+        chrome.tabs
+          .update(details.tabId, { url: chrome.runtime.getURL("blocked.html") })
+          .catch(() => {});
+      }
+      return recordBlockedAttempt(details.url, matchedSite, details.tabId);
     })
     .catch((error) => console.error("Failed to record blocked attempt:", error));
 });
