@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Focus Guard - Site Blocker",
+  "version": "0.1.0",
+  "description": "仕事中に開きがちなSNS・動画サイトをブロックするシンプルなChrome拡張です。",
+  "permissions": [
+    "declarativeNetRequest",
+    "alarms",
+    "storage",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Focus Guard"
+  },
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "blocked.html",
+        "blocked.js",
+        "style.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

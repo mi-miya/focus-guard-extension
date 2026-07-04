@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <title>Blocked by Focus Guard</title>
+</head>
+<body class="blocked">
+  <main class="card blockedCard">
+    <p class="label">Focus Guard</p>
+    <h1 id="blockedTitle">今は開かない設定です。</h1>
+    <p id="blockedText" class="muted">仕事の流れを守るため、このページはブロックされました。</p>
+    <section class="statsPanel" aria-label="アクセス回数">
+      <div>
+        <span class="statLabel">今日</span>
+        <strong id="todayCount">-</strong>
+      </div>
+      <div>
+        <span class="statLabel">直近7日</span>
+        <strong id="weekCount">-</strong>
+      </div>
+      <div>
+        <span class="statLabel">累計</span>
+        <strong id="totalCount">-</strong>
+      </div>
+    </section>
+    <p id="lastAttempt" class="muted smallText"></p>
+    <a class="buttonLike" href="about:blank">空白ページへ移動</a>
+  </main>
+  <script src="blocked.js"></script>
+</body>
+</html>

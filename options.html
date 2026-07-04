@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <title>Focus Guard 設定</title>
+</head>
+<body>
+  <main class="card">
+    <p class="label">Focus Guard 設定</p>
+    <h1>ブロックするURL</h1>
+    <p class="muted">1行に1つずつ入力してください。例: <code>x.com</code> / <code>https://youtube.com</code> / <code>youtube.com/shorts</code></p>
+    <label class="switchRow">
+      <input id="enabled" type="checkbox">
+      <span>ブロックを有効にする</span>
+    </label>
+    <textarea id="sites" spellcheck="false" rows="12" placeholder="x.com&#10;https://youtube.com&#10;youtube.com/shorts"></textarea>
+    <div class="buttonRow">
+      <button id="save" type="button">保存</button>
+      <button id="reset" type="button" class="secondary">初期値に戻す</button>
+    </div>
+    <p id="message" class="message"></p>
+  </main>
+  <script src="options.js"></script>
+</body>
+</html>

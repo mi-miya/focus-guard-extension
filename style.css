@@ -1,0 +1,166 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f5f5f2;
+  --card: #ffffff;
+  --text: #202020;
+  --muted: #666666;
+  --border: #dddddd;
+  --button: #202020;
+  --buttonText: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #151515;
+    --card: #202020;
+    --text: #f2f2f2;
+    --muted: #b5b5b5;
+    --border: #3a3a3a;
+    --button: #f2f2f2;
+    --buttonText: #202020;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+body.popup {
+  min-height: auto;
+  padding: 12px;
+  min-width: 300px;
+}
+.card {
+  width: min(680px, 100%);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.08);
+}
+.compact { padding: 18px; }
+.blockedCard { text-align: center; }
+.statsPanel {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 18px 0 8px;
+}
+.statsPanel div {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px;
+}
+.statsPanel strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+.statLabel {
+  color: var(--muted);
+  font-size: 12px;
+}
+.smallText {
+  font-size: 13px;
+}
+.label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  line-height: 1.25;
+}
+.popup h1 { font-size: 22px; }
+.muted {
+  color: var(--muted);
+  line-height: 1.7;
+}
+textarea {
+  width: 100%;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font: 15px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+button, .buttonLike {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 12px;
+  border: 1px solid var(--button);
+  border-radius: 999px;
+  padding: 12px 16px;
+  background: var(--button);
+  color: var(--buttonText);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+button.secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+button.subtle {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 8px;
+}
+button.subtle:hover {
+  color: var(--text);
+  border-color: transparent;
+  text-decoration: underline;
+}
+.buttonRow {
+  display: flex;
+  gap: 12px;
+}
+.pauseRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.pauseRow button {
+  margin-top: 0;
+  padding-inline: 10px;
+}
+.switchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  font-weight: 700;
+}
+.message {
+  min-height: 24px;
+  color: var(--muted);
+}
+code {
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: rgba(128,128,128,.14);
+}
