@@ -23,15 +23,19 @@ function isFacebookStats(stats) {
 }
 
 function updateEscapeLink(stats) {
+  // Facebook のときだけ Messenger へ抜けられるボタンを出す。
+  // それ以外は空白ページを開くだけで意味がないためボタンを表示しない。
   const escapeLink = document.getElementById("escapeLink");
-  if (!isFacebookStats(stats)) {
-    escapeLink.href = "about:blank";
-    escapeLink.textContent = "空白ページへ移動";
-    return;
-  }
+  escapeLink.hidden = !isFacebookStats(stats);
+}
 
-  escapeLink.href = "https://www.messenger.com/";
-  escapeLink.textContent = "Messengerへ移動";
+function showRandomQuote() {
+  const quotes = window.FOCUS_GUARD_QUOTES;
+  if (!Array.isArray(quotes) || quotes.length === 0) return;
+
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  document.getElementById("quoteText").textContent = `「${quote.text}」`;
+  document.getElementById("quoteAuthor").textContent = `— ${quote.author}`;
 }
 
 async function loadStats() {
@@ -48,6 +52,8 @@ async function loadStats() {
   document.getElementById("lastAttempt").textContent = `最後のアクセス: ${formatTime(stats.lastAt)}`;
   updateEscapeLink(stats);
 }
+
+showRandomQuote();
 
 loadStats().catch(() => {
   document.getElementById("lastAttempt").textContent = "アクセス回数を読み込めませんでした。";

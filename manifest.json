@@ -25,6 +25,7 @@
       "resources": [
         "blocked.html",
         "blocked.js",
+        "quotes.js",
         "style.css"
       ],
       "matches": [

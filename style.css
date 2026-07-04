@@ -72,6 +72,25 @@ body.popup {
 .smallText {
   font-size: 13px;
 }
+.quoteBox {
+  margin: 20px 0 4px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(128,128,128,.06);
+}
+.quoteBox blockquote {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+.quoteAuthor {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
 .label {
   margin: 0 0 8px;
   font-size: 12px;
