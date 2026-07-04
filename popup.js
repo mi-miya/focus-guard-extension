@@ -1,5 +1,5 @@
 const STORAGE_KEY = "focusGuardSettings";
-const DEFAULT_SITES = ["x.com", "twitter.com", "youtube.com", "youtu.be"];
+const DEFAULT_SITES = ["x.com", "twitter.com", "youtube.com", "youtu.be", "facebook.com"];
 
 async function getSettings() {
   const data = await chrome.storage.sync.get(STORAGE_KEY);

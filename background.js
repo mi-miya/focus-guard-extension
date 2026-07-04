@@ -1,4 +1,4 @@
-const DEFAULT_SITES = ["x.com", "twitter.com", "youtube.com", "youtu.be"];
+const DEFAULT_SITES = ["x.com", "twitter.com", "youtube.com", "youtu.be", "facebook.com"];
 const STORAGE_KEY = "focusGuardSettings";
 const STATS_KEY = "focusGuardStats";
 const PAUSE_ALARM_NAME = "focusGuardPauseUntil";
@@ -80,14 +80,80 @@ function getRecentDateKeys(days, now = Date.now()) {
 }
 
 function getSiteKey(site) {
+  if ((site.host === "x.com" || site.host === "twitter.com") && site.path === "/") {
+    return "x-twitter/";
+  }
+  if ((site.host === "youtube.com" || site.host === "youtu.be") && site.path === "/") {
+    return "youtube/";
+  }
   return `${site.host}${site.path}`;
 }
 
 function getSiteLabel(site) {
-  if (site.host === "youtube.com" || site.host === "youtu.be") return "YouTube";
-  if (site.host === "x.com") return "X";
-  if (site.host === "twitter.com") return "Twitter";
+  if ((site.host === "youtube.com" || site.host === "youtu.be") && site.path === "/") return "YouTube";
+  if ((site.host === "x.com" || site.host === "twitter.com") && site.path === "/") return "X / Twitter";
+  if (site.host === "facebook.com" && site.path === "/") return "Facebook";
   return site.path === "/" ? site.host : `${site.host}${site.path}`;
+}
+
+function mergeStatEntries(primaryEntry, secondaryEntry) {
+  if (!secondaryEntry) return primaryEntry;
+  const merged = primaryEntry || {
+    key: secondaryEntry.key,
+    label: secondaryEntry.label,
+    days: {},
+    total: 0,
+    lastAt: null,
+    lastUrl: ""
+  };
+
+  for (const [dateKey, count] of Object.entries(secondaryEntry.days || {})) {
+    merged.days[dateKey] = (merged.days[dateKey] || 0) + count;
+  }
+  merged.total = (merged.total || 0) + (secondaryEntry.total || 0);
+  if (!merged.lastAt || (secondaryEntry.lastAt && secondaryEntry.lastAt > merged.lastAt)) {
+    merged.lastAt = secondaryEntry.lastAt;
+    merged.lastUrl = secondaryEntry.lastUrl;
+  }
+  return merged;
+}
+
+function migrateCombinedStatGroup(stats, combinedKey, combinedLabel, sourceKeys) {
+  const combinedKeys = [combinedKey, ...sourceKeys];
+  const existingCombinedEntries = combinedKeys.map((key) => stats.sites[key]).filter(Boolean);
+  if (!existingCombinedEntries.length) return;
+
+  let mergedEntry = null;
+  for (const entry of existingCombinedEntries) {
+    mergedEntry = mergeStatEntries(mergedEntry, entry);
+  }
+  mergedEntry.key = combinedKey;
+  mergedEntry.label = combinedLabel;
+  mergedEntry.days = pruneOldDays(mergedEntry.days);
+
+  stats.sites[combinedKey] = mergedEntry;
+  for (const sourceKey of sourceKeys) {
+    delete stats.sites[sourceKey];
+  }
+
+  if (stats.latest && combinedKeys.includes(stats.latest.key)) {
+    stats.latest = summarizeAttempt(mergedEntry);
+  }
+  if (stats.latestByTabId) {
+    for (const [tabId, latest] of Object.entries(stats.latestByTabId)) {
+      if (latest && combinedKeys.includes(latest.key)) {
+        stats.latestByTabId[tabId] = summarizeAttempt(mergedEntry);
+      }
+    }
+  }
+}
+
+function migrateCombinedStats(stats) {
+  if (!stats || !stats.sites) return stats;
+
+  migrateCombinedStatGroup(stats, "x-twitter/", "X / Twitter", ["x.com/", "twitter.com/"]);
+  migrateCombinedStatGroup(stats, "youtube/", "YouTube", ["youtube.com/", "youtu.be/"]);
+  return stats;
 }
 
 function findMatchingSite(url, sites) {
@@ -140,7 +206,7 @@ async function recordBlockedAttempt(url, site, tabId) {
   const todayKey = formatDateKey(now);
   const key = getSiteKey(site);
   const data = await chrome.storage.local.get(STATS_KEY);
-  const stats = data[STATS_KEY] || { sites: {}, latest: null, latestByTabId: {} };
+  const stats = migrateCombinedStats(data[STATS_KEY] || { sites: {}, latest: null, latestByTabId: {} });
   const entry = stats.sites[key] || {
     key,
     label: getSiteLabel(site),
@@ -169,7 +235,7 @@ async function recordBlockedAttempt(url, site, tabId) {
 
 async function getLatestStats(tabId) {
   const data = await chrome.storage.local.get(STATS_KEY);
-  const stats = data[STATS_KEY];
+  const stats = migrateCombinedStats(data[STATS_KEY]);
   if (!stats || !stats.latest) return null;
 
   if (Number.isFinite(tabId) && stats.latestByTabId && stats.latestByTabId[String(tabId)]) {

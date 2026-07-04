@@ -12,6 +12,28 @@ function formatTime(timestamp) {
   });
 }
 
+function isFacebookStats(stats) {
+  if (stats.key === "facebook.com/") return true;
+  try {
+    const hostname = new URL(stats.url).hostname.replace(/^www\./i, "").toLowerCase();
+    return hostname === "facebook.com" || hostname.endsWith(".facebook.com");
+  } catch (_error) {
+    return false;
+  }
+}
+
+function updateEscapeLink(stats) {
+  const escapeLink = document.getElementById("escapeLink");
+  if (!isFacebookStats(stats)) {
+    escapeLink.href = "about:blank";
+    escapeLink.textContent = "空白ページへ移動";
+    return;
+  }
+
+  escapeLink.href = "https://www.messenger.com/";
+  escapeLink.textContent = "Messengerへ移動";
+}
+
 async function loadStats() {
   const response = await chrome.runtime.sendMessage({ type: "GET_LATEST_STATS" });
   if (!response || !response.ok || !response.stats) return;
@@ -24,6 +46,7 @@ async function loadStats() {
   document.getElementById("weekCount").textContent = formatCount(stats.weekCount);
   document.getElementById("totalCount").textContent = formatCount(stats.totalCount);
   document.getElementById("lastAttempt").textContent = `最後のアクセス: ${formatTime(stats.lastAt)}`;
+  updateEscapeLink(stats);
 }
 
 loadStats().catch(() => {

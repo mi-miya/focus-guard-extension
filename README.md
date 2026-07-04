@@ -8,6 +8,7 @@
 - twitter.com
 - youtube.com
 - youtu.be
+- facebook.com
 
 ## インストール方法
 
@@ -23,8 +24,10 @@
 - 「5分だけ解除」「1時間だけ解除」から、確認後にNGリストを一時的に無効化できます。時間が過ぎると自動で再開します。
 - 「ブロック対象を編集」から、1行に1つずつ対象URLを追加・削除できます。
 - ブロックされたページでは、今日・直近7日・累計のアクセス試行回数を確認できます。
+- `x.com` と `twitter.com`、`youtube.com` と `youtu.be` はそれぞれ同じサービスとして合算してカウントします。
+- Facebookがブロックされた場合は、ブロック画面からMessengerへ移動できます。
 - 初期登録されている `x.com` や `youtube.com` も、不要なら削除できます。
-- 入力例: `example.com` / `https://youtube.com` / `youtube.com/shorts`
+- 入力例: `example.com` / `https://youtube.com` / `facebook.com` / `youtube.com/shorts`
 - 例: `youtube.com/shorts` と書くとYouTube Shortsだけを止める用途にも使えます。
 - 全行を削除して保存すると、ブロック対象を空にできます。
 
