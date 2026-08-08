@@ -38,6 +38,46 @@ function showRandomQuote() {
   document.getElementById("quoteAuthor").textContent = `— ${quote.author}`;
 }
 
+function renderTrend(stats) {
+  const trendRow = document.getElementById("trendRow");
+  const recent = Array.isArray(stats.recentDays) ? stats.recentDays : null;
+  if (!recent || recent.length < 2) {
+    trendRow.hidden = true;
+    return;
+  }
+
+  // 直近7日の推移をスパークラインで描く。
+  const counts = recent.map((day) => Number(day.count) || 0);
+  const max = Math.max(1, ...counts);
+  const n = counts.length;
+  const points = counts
+    .map((value, index) => {
+      const x = 2 + (index / (n - 1)) * 104;
+      const y = 29 - (value / max) * 27;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  const lastX = 2 + 104;
+  const lastY = 29 - (counts[n - 1] / max) * 27;
+
+  const svg = document.getElementById("sparkline");
+  svg.innerHTML =
+    `<polyline class="sparkLine" points="${points}" />` +
+    `<circle class="sparkDot" cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="2.5" />`;
+
+  // 昨日との比較文言。減っていれば前向きに、増えていれば気づきを促す。
+  const diff = (Number(stats.todayCount) || 0) - (Number(stats.yesterdayCount) || 0);
+  const text = document.getElementById("trendText");
+  if (diff < 0) {
+    text.innerHTML = `昨日より <b class="is-good">${Math.abs(diff)}回 少ない</b> ペースです。`;
+  } else if (diff > 0) {
+    text.innerHTML = `昨日より <b class="is-bad">${diff}回 多く</b> 向かっています。`;
+  } else {
+    text.textContent = "昨日と同じペースです。";
+  }
+  trendRow.hidden = false;
+}
+
 async function loadStats() {
   const response = await chrome.runtime.sendMessage({ type: "GET_LATEST_STATS" });
   if (!response || !response.ok || !response.stats) return;
@@ -50,6 +90,7 @@ async function loadStats() {
   document.getElementById("weekCount").textContent = formatCount(stats.weekCount);
   document.getElementById("totalCount").textContent = formatCount(stats.totalCount);
   document.getElementById("lastAttempt").textContent = `最後のアクセス: ${formatTime(stats.lastAt)}`;
+  renderTrend(stats);
   updateEscapeLink(stats);
 }
 

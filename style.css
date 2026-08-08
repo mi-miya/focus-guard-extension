@@ -167,7 +167,7 @@ button.secondary {
   color: var(--text);
   border-color: var(--border);
 }
-button.subtle {
+.subtle {
   background: transparent;
   color: var(--muted);
   border-color: transparent;
@@ -176,7 +176,7 @@ button.subtle {
   margin-top: 8px;
   padding: 4px 8px;
 }
-button.subtle:hover {
+.subtle:hover {
   color: var(--text);
   border-color: transparent;
   text-decoration: underline;
@@ -353,3 +353,25 @@ code {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+/* ===== blocked.html のミニ推移 ===== */
+.trendRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0 2px;
+}
+.trendText { font-size: 13px; color: var(--muted); }
+.trendText b.is-good { color: var(--good); }
+.trendText b.is-bad { color: var(--bad); }
+.sparkline { width: 108px; height: 30px; display: block; }
+.sparkLine {
+  fill: none;
+  stroke: var(--series-1);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.sparkDot { fill: var(--series-1); }
