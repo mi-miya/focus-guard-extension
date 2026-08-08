@@ -23,11 +23,18 @@ function getActivePauseUntil(settings) {
   return settings.pauseUntil && settings.pauseUntil > Date.now() ? settings.pauseUntil : null;
 }
 
+// 12時間の解除は翌日にまたぐので、日付が変わる場合だけ日付も添える。
 function formatPauseTime(timestamp) {
-  return new Date(timestamp).toLocaleTimeString("ja-JP", {
+  const end = new Date(timestamp);
+  const time = end.toLocaleTimeString("ja-JP", {
     hour: "2-digit",
     minute: "2-digit"
   });
+  if (end.toDateString() === new Date().toDateString()) {
+    return time;
+  }
+  const date = end.toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" });
+  return `${date} ${time}`;
 }
 
 async function sendMessage(message) {
@@ -82,20 +89,25 @@ document.getElementById("toggleButton").addEventListener("click", async () => {
 });
 
 async function pauseFor(durationMs, label) {
-  if (!confirm(`${label}だけNGリストを無効にします。本当にいいですか？`)) {
+  const until = formatPauseTime(Date.now() + durationMs);
+  if (!confirm(`${label}（${until}まで）NGリストを無効にします。本当にいいですか？`)) {
     return;
   }
   await sendMessage({ type: "PAUSE_FOR", durationMs });
   await render();
 }
 
-document.getElementById("pause5Button").addEventListener("click", () => {
-  pauseFor(5 * 60 * 1000, "5分");
-});
+const PAUSE_PRESETS = [
+  { buttonId: "pause5Button", label: "5分", durationMs: 5 * 60 * 1000 },
+  { buttonId: "pause60Button", label: "1時間", durationMs: 60 * 60 * 1000 },
+  { buttonId: "pause720Button", label: "12時間", durationMs: 12 * 60 * 60 * 1000 }
+];
 
-document.getElementById("pause60Button").addEventListener("click", () => {
-  pauseFor(60 * 60 * 1000, "1時間");
-});
+for (const preset of PAUSE_PRESETS) {
+  document.getElementById(preset.buttonId).addEventListener("click", () => {
+    pauseFor(preset.durationMs, preset.label);
+  });
+}
 
 document.getElementById("statsButton").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("stats.html") });

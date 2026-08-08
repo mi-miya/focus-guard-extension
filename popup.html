@@ -11,9 +11,11 @@
     <p class="label">Focus Guard</p>
     <h1 id="statusTitle">読み込み中...</h1>
     <p id="statusText" class="muted"></p>
-    <div class="pauseRow" aria-label="一時解除">
-      <button id="pause5Button" type="button" class="secondary">5分だけ解除</button>
-      <button id="pause60Button" type="button" class="secondary">1時間だけ解除</button>
+    <p id="pauseLabel" class="pauseLabel">一時解除</p>
+    <div class="pauseRow" role="group" aria-labelledby="pauseLabel">
+      <button id="pause5Button" type="button" class="secondary">5分</button>
+      <button id="pause60Button" type="button" class="secondary">1時間</button>
+      <button id="pause720Button" type="button" class="secondary">12時間</button>
     </div>
     <button id="statsButton" type="button" class="secondary">記録を見る</button>
     <button id="optionsButton" type="button" class="secondary">ブロック対象を編集</button>
