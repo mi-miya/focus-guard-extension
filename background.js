@@ -185,10 +185,16 @@ function pruneOldDays(days) {
 function summarizeAttempt(entry, now = Date.now()) {
   const days = entry.days || {};
   const todayKey = formatDateKey(now);
+  const yesterdayKey = formatDateKey(now - 24 * 60 * 60 * 1000);
   const weekKeys = new Set(getRecentDateKeys(7, now));
   const weekCount = Object.entries(days)
     .filter(([dateKey]) => weekKeys.has(dateKey))
     .reduce((total, [, count]) => total + count, 0);
+  // 直近7日を古い順（左）→新しい順（右）で並べ、blocked.html のミニ推移に使う。
+  const recentDays = getRecentDateKeys(7, now)
+    .slice()
+    .reverse()
+    .map((dateKey) => ({ date: dateKey, count: days[dateKey] || 0 }));
 
   return {
     key: entry.key,
@@ -196,8 +202,10 @@ function summarizeAttempt(entry, now = Date.now()) {
     url: entry.lastUrl,
     lastAt: entry.lastAt,
     todayCount: days[todayKey] || 0,
+    yesterdayCount: days[yesterdayKey] || 0,
     weekCount,
-    totalCount: entry.total || 0
+    totalCount: entry.total || 0,
+    recentDays
   };
 }
 
