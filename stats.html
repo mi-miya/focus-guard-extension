@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <title>Focus Guard 記録</title>
+</head>
+<body class="viz-root">
+  <main class="card">
+    <p class="label">Focus Guard</p>
+    <h1>開いてしまった記録</h1>
+    <p class="muted">ブロック対象を開こうとした回数の推移です。今日は昨日より減らせているか、ここで振り返れます。</p>
+
+    <section class="heroRow" aria-label="今日の状況">
+      <div class="hero">
+        <span class="statLabel">今日ここまで</span>
+        <strong id="heroToday">-</strong>
+      </div>
+      <div class="hero">
+        <span class="statLabel">昨日比</span>
+        <strong id="heroDelta" class="delta">-</strong>
+      </div>
+    </section>
+
+    <div class="rangeRow" role="group" aria-label="表示期間">
+      <button type="button" class="rangeButton" data-days="7">7日</button>
+      <button type="button" class="rangeButton is-active" data-days="30">30日</button>
+      <button type="button" class="rangeButton" data-days="90">90日</button>
+    </div>
+
+    <figure class="chartFigure">
+      <div class="chartWrap">
+        <div id="chart"></div>
+        <div id="tooltip" class="chartTooltip" hidden></div>
+      </div>
+      <figcaption id="legend" class="legend"></figcaption>
+    </figure>
+
+    <div class="tableWrap">
+      <table class="statsTable" id="siteTable">
+        <thead>
+          <tr>
+            <th scope="col">サイト</th>
+            <th scope="col" class="num">今日</th>
+            <th scope="col" class="num">昨日</th>
+            <th scope="col" class="num">直近7日</th>
+            <th scope="col" class="num">累計</th>
+          </tr>
+        </thead>
+        <tbody id="siteTableBody"></tbody>
+      </table>
+    </div>
+
+    <p id="emptyState" class="muted" hidden>まだ記録がありません。ブロック対象を開こうとすると、ここに回数が貯まっていきます。</p>
+  </main>
+  <script src="stats.js"></script>
+</body>
+</html>

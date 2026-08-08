@@ -97,6 +97,10 @@ document.getElementById("pause60Button").addEventListener("click", () => {
   pauseFor(60 * 60 * 1000, "1時間");
 });
 
+document.getElementById("statsButton").addEventListener("click", () => {
+  chrome.tabs.create({ url: chrome.runtime.getURL("stats.html") });
+});
+
 document.getElementById("optionsButton").addEventListener("click", () => {
   chrome.runtime.openOptionsPage();
 });

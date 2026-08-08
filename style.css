@@ -7,6 +7,20 @@
   --border: #dddddd;
   --button: #202020;
   --buttonText: #ffffff;
+
+  /* dataviz skill の検証済みカテゴリカル配色（ライト面）。サイト識別に使う。 */
+  --series-1: #2a78d6;
+  --series-2: #1baf7a;
+  --series-3: #eda100;
+  --series-4: #008300;
+  --series-5: #4a3aa7;
+  --series-6: #e34948;
+  --series-7: #e87ba4;
+  --series-8: #eb6834;
+  --grid: #e1e0d9;
+  --axis: #898781;
+  --good: #006300;
+  --bad: #d03b3b;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -18,6 +32,20 @@
     --border: #3a3a3a;
     --button: #f2f2f2;
     --buttonText: #202020;
+
+    /* 同じ8色をダーク面向けにステップした列。 */
+    --series-1: #3987e5;
+    --series-2: #199e70;
+    --series-3: #c98500;
+    --series-4: #008300;
+    --series-5: #9085e9;
+    --series-6: #e66767;
+    --series-7: #d55181;
+    --series-8: #d95926;
+    --grid: #2c2c2a;
+    --axis: #898781;
+    --good: #0ca30c;
+    --bad: #e66767;
   }
 }
 
@@ -182,4 +210,146 @@ code {
   padding: 2px 5px;
   border-radius: 6px;
   background: rgba(128,128,128,.14);
+}
+
+/* ===== 記録ページ（stats.html） ===== */
+.heroRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0 4px;
+}
+.hero {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.hero strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 30px;
+  line-height: 1.1;
+}
+.delta.is-good { color: var(--good); }
+.delta.is-bad { color: var(--bad); }
+.delta.is-flat { color: var(--muted); }
+
+.rangeRow {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 12px;
+}
+.rangeButton {
+  width: auto;
+  margin-top: 0;
+  padding: 6px 16px;
+  font-size: 13px;
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+.rangeButton.is-active {
+  background: var(--button);
+  color: var(--buttonText);
+  border-color: var(--button);
+}
+
+.chartFigure { margin: 0; }
+.chartWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 640 / 240;
+}
+.chartSvg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.gridLine { stroke: var(--grid); stroke-width: 1; }
+.axisLabel {
+  fill: var(--axis);
+  font-size: 11px;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.seriesLine {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.seriesDot { stroke: var(--card); stroke-width: 1.5; }
+.crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 3; }
+
+.chartTooltip {
+  position: absolute;
+  top: 8px;
+  pointer-events: none;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.14);
+  min-width: 120px;
+  z-index: 2;
+}
+.tipDate { font-weight: 700; margin-bottom: 4px; }
+.tipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.7;
+}
+.tipSwatch, .legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+  flex: none;
+}
+.tipNum {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 14px;
+}
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.tableWrap { margin-top: 20px; overflow-x: auto; }
+.statsTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.statsTable th, .statsTable td {
+  padding: 10px 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.statsTable thead th {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.statsTable tbody th {
+  font-weight: 600;
+}
+.statsTable tbody th .legendSwatch { margin-right: 8px; vertical-align: middle; }
+.statsTable .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
 }

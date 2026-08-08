@@ -26,7 +26,9 @@
         "blocked.html",
         "blocked.js",
         "quotes.js",
-        "style.css"
+        "style.css",
+        "stats.html",
+        "stats.js"
       ],
       "matches": [
         "<all_urls>"
