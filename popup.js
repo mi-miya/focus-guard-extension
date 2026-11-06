@@ -62,7 +62,7 @@ async function render() {
 
   statusTitle.textContent = settings.enabled ? "ブロック中" : "停止中";
   statusText.textContent = settings.enabled
-    ? `${settings.sites.length}件のURLを止めています。`
+    ? `${settings.sites.filter((line) => !String(line).trim().startsWith("!")).length}件のURLを止めています。`
     : "今はブロックしていません。";
   toggleButton.textContent = settings.enabled ? "期限なしで停止する" : "再開する";
   toggleButton.classList.toggle("subtle", settings.enabled);

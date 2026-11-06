@@ -1,3 +1,5 @@
+importScripts("rules.js");
+
 const DEFAULT_SITES = ["x.com", "twitter.com", "youtube.com", "youtu.be", "facebook.com"];
 const STORAGE_KEY = "focusGuardSettings";
 const STATS_KEY = "focusGuardStats";
@@ -28,39 +30,46 @@ async function setPauseAlarm(pauseUntil) {
   }
 }
 
-function normalizeSiteLine(line) {
-  let value = String(line || "").trim();
-  if (!value || value.startsWith("#")) return null;
+async function createRules(lines) {
+  const rules = lines.map(parseRuleLine).filter(Boolean);
+  const seen = new Set();
+  const dnrRules = [];
 
-  // "https://www.youtube.com/shorts" のようなURLも、"youtube.com/shorts" のような指定も受け付ける。
-  value = value.replace(/^https?:\/\//i, "").replace(/^www\./i, "");
-  value = value.split(/[?#]/)[0];
-  value = value.replace(/\s+/g, "");
-  value = value.replace(/\/*$/, "");
+  for (const rule of rules) {
+    const condition = ruleToCondition(rule);
+    if (!condition) continue;
 
-  if (!value) return null;
-
-  const [host, ...pathParts] = value.split("/");
-  if (!host || !host.includes(".")) return null;
-
-  const path = pathParts.length ? "/" + pathParts.join("/") : "/";
-  return { host: host.toLowerCase(), path };
-}
-
-function createRules(sites) {
-  const filters = [...new Set(sites.map(normalizeSiteLine).filter(Boolean).map((site) => `||${site.host}${site.path}`))];
-  return filters.map((urlFilter, index) => ({
-    id: index + 1,
-    priority: 1,
-    action: {
-      type: "redirect",
-      redirect: { extensionPath: "/blocked.html" }
-    },
-    condition: {
-      urlFilter,
-      resourceTypes: ["main_frame"]
+    // Chromeが扱えない正規表現（RE2非対応の書き方など）が1つでもあると全ルールの登録に失敗するので除いておく。
+    if (condition.regexFilter) {
+      const result = await chrome.declarativeNetRequest.isRegexSupported({
+        regex: condition.regexFilter,
+        isCaseSensitive: false
+      });
+      if (!result.isSupported) {
+        console.warn("Unsupported regex skipped:", condition.regexFilter, result.reason);
+        continue;
+      }
     }
-  }));
+
+    const dedupeKey = JSON.stringify([rule.exclude, condition]);
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    dnrRules.push({
+      id: dnrRules.length + 1,
+      // 除外ルールはブロックより優先させる。
+      priority: rule.exclude ? 2 : 1,
+      action: rule.exclude
+        ? { type: "allow" }
+        : { type: "redirect", redirect: { extensionPath: "/blocked.html" } },
+      condition: {
+        ...condition,
+        isUrlFilterCaseSensitive: false,
+        resourceTypes: ["main_frame"]
+      }
+    });
+  }
+  return dnrRules;
 }
 
 function formatDateKey(timestamp) {
@@ -80,6 +89,8 @@ function getRecentDateKeys(days, now = Date.now()) {
 }
 
 function getSiteKey(site) {
+  if (site.type === "contains") return `~${site.pattern}`;
+  if (site.type === "regex") return `/${site.pattern}/`;
   if ((site.host === "x.com" || site.host === "twitter.com") && site.path === "/") {
     return "x-twitter/";
   }
@@ -90,6 +101,8 @@ function getSiteKey(site) {
 }
 
 function getSiteLabel(site) {
+  if (site.type === "contains") return `「${site.pattern}」を含むURL`;
+  if (site.type === "regex") return `正規表現 /${site.pattern}/`;
   if ((site.host === "youtube.com" || site.host === "youtu.be") && site.path === "/") return "YouTube";
   if ((site.host === "x.com" || site.host === "twitter.com") && site.path === "/") return "X / Twitter";
   if (site.host === "facebook.com" && site.path === "/") return "Facebook";
@@ -154,25 +167,6 @@ function migrateCombinedStats(stats) {
   migrateCombinedStatGroup(stats, "x-twitter/", "X / Twitter", ["x.com/", "twitter.com/"]);
   migrateCombinedStatGroup(stats, "youtube/", "YouTube", ["youtube.com/", "youtu.be/"]);
   return stats;
-}
-
-function findMatchingSite(url, sites) {
-  let parsedUrl;
-  try {
-    parsedUrl = new URL(url);
-  } catch (_error) {
-    return null;
-  }
-
-  const hostname = parsedUrl.hostname.replace(/^www\./i, "").toLowerCase();
-  const pathname = parsedUrl.pathname || "/";
-  const normalizedSites = sites.map(normalizeSiteLine).filter(Boolean);
-
-  return normalizedSites.find((site) => {
-    const hostMatches = hostname === site.host || hostname.endsWith(`.${site.host}`);
-    const pathMatches = site.path === "/" || pathname === site.path || pathname.startsWith(`${site.path}/`);
-    return hostMatches && pathMatches;
-  }) || null;
 }
 
 function pruneOldDays(days) {
@@ -261,7 +255,7 @@ async function updateRules() {
   const removeRuleIds = existingRules.map((rule) => rule.id);
   const settings = await getSettings();
   const paused = isPaused(settings);
-  const addRules = settings.enabled && !paused ? createRules(settings.sites) : [];
+  const addRules = settings.enabled && !paused ? await createRules(settings.sites) : [];
 
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds,
@@ -321,7 +315,7 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
       // まだ解除期間内なら何もしない。
       if (!pauseExpired && isPaused(settings)) return null;
 
-      const matchedSite = findMatchingSite(details.url, settings.sites);
+      const matchedSite = findMatchingRule(details.url, settings.sites);
       if (!matchedSite) return null;
 
       // 期限切れ直後はDNRルールの再登録が間に合わないことがあるので、

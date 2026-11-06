@@ -213,6 +213,83 @@ button.secondary {
   min-height: 24px;
   color: var(--muted);
 }
+/* ===== 設定画面のルール行（options.html） ===== */
+.ruleHelp {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.ruleHelp dt {
+  font-weight: 700;
+  margin-top: 8px;
+}
+.ruleHelp dt:first-child { margin-top: 0; }
+.ruleHelp dd {
+  margin: 2px 0 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.ruleList {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+.ruleRow {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+}
+.ruleRow select,
+.ruleRow input[type="text"] {
+  min-width: 0;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+}
+.ruleRow select option {
+  background: var(--card);
+  color: var(--text);
+}
+.ruleRow input[type="text"] {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.ruleExclude {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.ruleRow .ruleRemove {
+  width: auto;
+  margin-top: 0;
+}
+.ruleError {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--bad);
+  font-size: 13px;
+}
+.ruleError:empty { display: none; }
+.addRule {
+  margin-top: 10px;
+}
+@media (max-width: 560px) {
+  .ruleRow {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ruleRow .ruleType { grid-column: 1 / -1; }
+}
+
 code {
   padding: 2px 5px;
   border-radius: 6px;

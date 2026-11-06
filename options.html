@@ -10,18 +10,32 @@
   <main class="card">
     <p class="label">Focus Guard 設定</p>
     <h1>ブロックするURL</h1>
-    <p class="muted">1行に1つずつ入力してください。例: <code>x.com</code> / <code>https://youtube.com</code> / <code>facebook.com</code> / <code>youtube.com/shorts</code></p>
+    <p class="muted">1行に1つずつ、照合のしかたを選んで入力してください。</p>
+    <dl class="ruleHelp">
+      <dt>ドメイン（サブドメインも含む）</dt>
+      <dd><code>youtube.com</code> → youtube.com・www.youtube.com・music.youtube.com などすべて。<code>youtube.com/shorts</code> のようにパスも指定できます。</dd>
+      <dt>ドメイン完全一致</dt>
+      <dd><code>youtube.com</code> → youtube.com と www.youtube.com だけ。music.youtube.com などは止めません。</dd>
+      <dt>部分一致</dt>
+      <dd>URL（ドメイン＋パス）にその文字列を含めば止めます。例: <code>shorts</code></dd>
+      <dt>正規表現</dt>
+      <dd>URL全体に対する正規表現（大文字小文字は区別しません）。例: <code>^https://(www\.)?youtube\.com/(watch|shorts)</code></dd>
+      <dt>除外</dt>
+      <dd>チェックを付けた行に当たるURLは、ほかの行に当たってもブロックしません。<br>例: 「ドメイン <code>youtube.com</code>」＋「除外・ドメイン <code>music.youtube.com</code>」で、YouTube Musicだけ開けます。</dd>
+    </dl>
     <label class="switchRow">
       <input id="enabled" type="checkbox">
       <span>ブロックを有効にする</span>
     </label>
-    <textarea id="sites" spellcheck="false" rows="12" placeholder="x.com&#10;https://youtube.com&#10;facebook.com&#10;youtube.com/shorts"></textarea>
+    <div id="ruleList" class="ruleList"></div>
+    <button id="addRule" type="button" class="secondary addRule">＋ 行を追加</button>
     <div class="buttonRow">
       <button id="save" type="button">保存</button>
       <button id="reset" type="button" class="secondary">初期値に戻す</button>
     </div>
     <p id="message" class="message"></p>
   </main>
+  <script src="rules.js"></script>
   <script src="options.js"></script>
 </body>
 </html>
